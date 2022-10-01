@@ -1,0 +1,175 @@
+# BitcoinSV Livebook
+
+```elixir
+Mix.install(
+  [
+    # to create BitcoinSV transactions, including keys and scripts
+    {:bsv, "~> 2.1"}
+  ],
+  config: [
+    bsv: [network: :test]
+  ]
+)
+
+# ran `mix local.rebar` to resolve:
+# Could not find "rebar3" to compile dependency :unicode_util_compat, please ensure "rebar3" is available
+```
+
+## Part 1 - Generate a Master Key and additional addresses
+
+## Generate a Mneumonic
+
+Wallets are software that manage transactions,
+much like a browser is software that manages HTML.
+
+Wallet keys are created from a generated keypair.
+
+Importantly, the keypair is reproduceable using the seed words. Thus, there is a lot of emphasis on securing seed phrases and/or keys, and rightly so.
+
+<!-- livebook:{"break_markdown":true} -->
+
+A seed phrase is a string of characters (often 12 words -- sometimes 24 words).
+
+Here's how to generate a seed phrase using the BSV library:
+
+```elixir
+mnemonic = BSV.Mnemonic.new()
+```
+
+## Creating a seed
+
+The randomly generated string can be passed to the `Mnemonic.to_seed` function to generate a binary string.
+
+```elixir
+seed = BSV.Mnemonic.to_seed(mnemonic)
+```
+
+## Create a seed phrase with a Passphrase
+
+Same as the example above. Except, an additional `passphrase` is passed to generate the seed.
+
+```elixir
+passphrase = "your-additional-passphrase-goes-here"
+seed = BSV.Mnemonic.to_seed(mnemonic, passphrase: passphrase)
+```
+
+## Generate an Extended key from a Seed
+
+```elixir
+extkey = BSV.ExtKey.from_seed!(seed)
+```
+
+## Derive a child key and address
+
+Derive a child keypair from the extended key
+using the first derivation path `m/0/1`, for demonstration purposes. 
+In practice, other derivation paths are often used instead.
+
+```elixir
+child = BSV.ExtKey.derive(extkey, "m/0/1")
+```
+
+## Get m/0/1's public key as a string
+
+```elixir
+address = BSV.Address.from_pubkey(child.pubkey)
+BSV.Address.to_string(address)
+```
+
+```elixir
+privkey = child.privkey |> BSV.PrivKey.to_wif()
+```
+
+So far, we have:
+
+* generated a random Mnemonic string
+* used that string to generate a binary Seed (optinally, with a passphrase)
+* used the Seed to generate an Extended Key
+* generate at least one derived keypair from the Extended Key
+* display the 1. private key, 2. public key, and 3. address from the generated keypairs
+
+---
+
+## Get m/0/2's public key as a string
+
+```elixir
+derivation_path = "m/0/2"
+
+child = BSV.ExtKey.derive(extkey, derivation_path)
+address = BSV.Address.from_pubkey(child.pubkey)
+BSV.Address.to_string(address)
+```
+
+## Get m/0/44/0's public key as a string
+
+BTC used `0/44/0` as its derivation path.
+
+> Note: Exodus describes how they use [derivation paths](https://support.exodus.com/article/1795-derivation-paths-in-exodus).
+
+Below, we generate an Extended Key using BTC'S derivation path. 
+This derivation path has ticks after the numbers 44' and 0', which indicate "hardened keys." You can find others resources online regarding HD Wallets and how hardened keys work.
+
+```elixir
+derivation_path = "m/0/44'/0'"
+
+child = BSV.ExtKey.derive(extkey, derivation_path)
+```
+
+Generate a (public) address from the public key.
+
+```elixir
+address = BSV.Address.from_pubkey(child.pubkey)
+BSV.Address.to_string(address)
+```
+
+And to get the private key:
+
+```elixir
+privkey = child.privkey |> BSV.PrivKey.to_wif()
+```
+
+## for fun: display 10 keys in a loop
+
+Wallets have to manage UTXO's and will scan common derivation paths, looking for active addresses.
+
+```elixir
+IO.puts("path  address_string                     privkey")
+
+Enum.each(0..9, fn i ->
+  derivation_path = "m/0/#{i}"
+  child = BSV.ExtKey.derive(extkey, derivation_path)
+  address = BSV.Address.from_pubkey(child.pubkey)
+  privkey = child.privkey |> BSV.PrivKey.to_wif()
+
+  address_string = BSV.Address.to_string(address)
+  IO.puts("#{derivation_path} #{address_string} #{privkey}")
+end)
+```
+
+To demonstrate how we can regenerate public addresses from the private keys:
+
+Derive a public address from a private key.
+
+After displaying the 10 keys, grab one of the `privkey` values and paste it below for the privkey variable, then run the code block.
+
+You should see the associated public address.
+
+You've now generated a Master Key from scratch, generated additional addresses that are derived from that key.
+
+```elixir
+privkey = "cMuVDNaxLkwSm5bxPhMc6tPCX45GVLyNtzW75sS3UfgVgFyJ7riH"
+
+{:ok, priv_key} = BSV.PrivKey.from_wif(privkey)
+
+keypair = priv_key |> BSV.KeyPair.from_privkey()
+
+%BSV.KeyPair{
+  privkey: privkey,
+  pubkey: pubkey
+} = keypair
+
+address = BSV.Address.from_pubkey(pubkey)
+address_string = BSV.Address.to_string(address)
+```
+
+Next steps, we'll use a key to create a transaction. And we'll find a faucet to get a bit of bitcoin to put to use.
