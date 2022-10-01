@@ -38,6 +38,14 @@ Here's how to generate a seed phrase using the BSV library:
 mnemonic = BSV.Mnemonic.new()
 ```
 
+Here are 2 examples of what a 12-word seed phrase looks like:
+
+`jacket ceiling drum praise auction rude travel interest undo occur shoulder stone`
+
+`super scene nice carry deer float grant twice exit nerve december glance`
+
+> Note: Hopefully obvious, but worth repeating: don't use these phrases for things outside of these exercises
+
 ## Creating a seed
 
 The randomly generated string can be passed to the `Mnemonic.to_seed` function to generate a binary string.
@@ -48,7 +56,8 @@ seed = BSV.Mnemonic.to_seed(mnemonic)
 
 ## Create a seed phrase with a Passphrase
 
-Same as the example above. Except, an additional `passphrase` is passed to generate the seed.
+Similar to the example above, except, 
+an additional `passphrase` is included when generating the seed.
 
 ```elixir
 passphrase = "your-additional-passphrase-goes-here"
@@ -56,6 +65,8 @@ seed = BSV.Mnemonic.to_seed(mnemonic, passphrase: passphrase)
 ```
 
 ## Generate an Extended key from a Seed
+
+An extended key can be used to derive additional keys in an [Hierarchial Deterministic Wallet](https://learnmeabitcoin.com/technical/hd-wallets).
 
 ```elixir
 extkey = BSV.ExtKey.from_seed!(seed)
@@ -104,7 +115,7 @@ BSV.Address.to_string(address)
 
 ## Get m/0/44/0's public key as a string
 
-BTC used `0/44/0` as its derivation path.
+BTC uses `0/44/0` as its derivation path.
 
 > Note: Exodus describes how they use [derivation paths](https://support.exodus.com/article/1795-derivation-paths-in-exodus).
 
@@ -117,17 +128,11 @@ derivation_path = "m/0/44'/0'"
 child = BSV.ExtKey.derive(extkey, derivation_path)
 ```
 
-Generate a (public) address from the public key.
+Again, generate a (public) address from the public key.
 
 ```elixir
 address = BSV.Address.from_pubkey(child.pubkey)
 BSV.Address.to_string(address)
-```
-
-And to get the private key:
-
-```elixir
-privkey = child.privkey |> BSV.PrivKey.to_wif()
 ```
 
 ## for fun: display 10 keys in a loop
