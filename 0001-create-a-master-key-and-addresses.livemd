@@ -17,6 +17,8 @@ Mix.install(
 
 ## Part 1 - Generate a Master Key and additional addresses
 
+[![Run in Livebook](https://livebook.dev/badge/v1/blue.svg)](https://livebook.dev/run?url=https://github.com/afomi/bitcoinsv-bench/blob/master/0001-create-a-master-key-and-addresses.livemd)
+
 ## Generate a Mneumonic
 
 Wallets are software that manage transactions,
