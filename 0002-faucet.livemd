@@ -1,0 +1,30 @@
+# BitcoinSV Livebook
+
+## Part 2 - Using a faucet
+
+## Receive bitcoin at a new address
+
+Our wallet starts empty, because the keys it manages have not received any transactions.
+
+Like cash, our initial bitcoin must come from somewhere. In practice, one person gives bitcoin to another, for goods or services. For this demo, we'll use a "faucet."
+
+A faucet is a website somebody maintains, funded with coins, that allows people to have small amounts of (testnet) coins. Like a sip of water, from a faucet. We'll use the faucet provided by https://faucet.bitails.net to get some satoshis to use.
+
+Fortunately, a small amount of bitcoin can go a long way.
+
+<!-- livebook:{"break_markdown":true} -->
+
+##### On the bitails.net faucet site:
+
+1. Enter the `public_address` you created in Part 1, and complete the captcha, to receive the bitcoin.
+2. You'll receive a confirmation message. The confirmation message will include a transaction ID. Make a note of the Transaction ID.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Keep a note of the `transaction ID` and keep the `public address` handy, as we'll use it next time.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Next time,
+we're going to use our newly acquired testnet satoshis
+to create a Bitcoin Transaction and send it somewhere - to a friend, or back to ourselves (as practice).
